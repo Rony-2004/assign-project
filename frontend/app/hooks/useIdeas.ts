@@ -76,7 +76,7 @@ export function useIdeas(): UseIdeasReturn {
     try {
       try {
         // Try to submit via API first
-        const newIdea = await apiClient.createIdea(`${title}\n\n${description}`);
+        const newIdea = await apiClient.createIdea(title, description);
         setIdeas(prev => [newIdea, ...prev]);
         return true;
       } catch (apiError) {

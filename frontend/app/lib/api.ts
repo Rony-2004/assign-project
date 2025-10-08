@@ -37,12 +37,12 @@ class ApiClient {
     return response.data;
   }
 
-  async createIdea(text: string): Promise<Idea> {
+  async createIdea(title: string, description: string): Promise<Idea> {
     const response = await this.request<Idea>('/ideas', {
       method: 'POST',
       body: JSON.stringify({ 
-        title: text.substring(0, 100),
-        description: text 
+        title: title.trim(),
+        description: description.trim()
       }),
     });
     return response.data;
