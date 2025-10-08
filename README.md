@@ -760,6 +760,88 @@ This project is licensed under the MIT License.
 
 Created as a full-stack developer assessment project.
 
+## 🌐 Production Deployment
+
+### Quick Deploy
+
+**Backend on Render + Frontend on Vercel**
+
+1. **Prerequisites:**
+   - GitHub account with your repository pushed
+   - [Render account](https://render.com) (free tier available)
+   - [Vercel account](https://vercel.com) (free tier available)
+
+2. **Deploy Backend to Render:**
+   ```bash
+   # Push your code to GitHub first
+   git add .
+   git commit -m "Prepare for deployment"
+   git push origin master
+   ```
+   
+   - Go to [Render Dashboard](https://dashboard.render.com/)
+   - Click "New +" → "Blueprint"
+   - Connect your repository
+   - Render will detect `render.yaml` and configure automatically
+   - Add required environment variables:
+     - `DATABASE_URL`: PostgreSQL connection string
+     - `CORS_ORIGIN`: Your Vercel frontend URL (or `*` temporarily)
+   
+3. **Deploy Frontend to Vercel:**
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click "Add New..." → "Project"
+   - Import your GitHub repository
+   - Set Root Directory to `frontend`
+   - Add environment variable:
+     - `NEXT_PUBLIC_API_URL`: Your Render backend URL + `/api`
+   - Click "Deploy"
+
+4. **Update CORS:**
+   - Go back to Render
+   - Update `CORS_ORIGIN` with your Vercel URL
+   - Service will automatically redeploy
+
+📚 **For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)**
+
+### Deployment Checklist
+
+- [ ] Backend deployed on Render with PostgreSQL
+- [ ] Frontend deployed on Vercel
+- [ ] Environment variables configured correctly
+- [ ] CORS settings updated with frontend URL
+- [ ] Health check endpoint working
+- [ ] Database migrations run successfully
+- [ ] Test creating and upvoting ideas
+
+### Monitoring
+
+**Check Backend Health:**
+```bash
+curl https://your-backend.onrender.com/api/health
+```
+
+**Expected Response:**
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-...",
+  "uptime": 123.456,
+  "database": "connected"
+}
+```
+
+### Free Tier Limitations
+
+**Render (Free):**
+- Services spin down after 15 minutes of inactivity
+- First request may take 30-60 seconds after spin-down
+- 750 hours/month limit
+
+**Vercel (Free):**
+- 100 GB bandwidth/month
+- 6000 build minutes/month
+- Perfect for this application size
+
 ## 🙏 Acknowledgments
 
 - [Next.js Documentation](https://nextjs.org/docs)
@@ -767,6 +849,8 @@ Created as a full-stack developer assessment project.
 - [Drizzle ORM Documentation](https://orm.drizzle.team/docs/overview)
 - [Neon Database](https://neon.tech/)
 - [Tailwind CSS](https://tailwindcss.com/)
+- [Render Documentation](https://render.com/docs)
+- [Vercel Documentation](https://vercel.com/docs)
 
 ---
 

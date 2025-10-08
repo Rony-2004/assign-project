@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: idea-board-backend
+    runtime: node
+    region: oregon
+    plan: free
+    branch: master
+    rootDir: backend
+    buildCommand: npm install && npm run build && npm run db:migrate
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: RATE_LIMIT_MAX
+        value: 100
+      - key: RATE_LIMIT_WINDOW
+        value: 60000
+      - key: LOG_LEVEL
+        value: info
