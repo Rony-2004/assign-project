@@ -82,26 +82,26 @@ export function IdeaForm({ onSubmit, editMode, onCancelEdit }: IdeaFormProps) {
   const remainingDescChars = 500 - description.length;
 
   return (
-    <div className="relative bg-gradient-to-br from-white via-purple-50 to-pink-50 dark:from-gray-800 dark:via-purple-900/20 dark:to-gray-900 rounded-3xl shadow-2xl border-2 border-purple-200 dark:border-purple-800 overflow-hidden">
+    <div className="relative bg-gradient-to-br from-white via-purple-50 to-pink-50 dark:from-gray-800 dark:via-purple-900/20 dark:to-gray-900 rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-purple-200 dark:border-purple-800 overflow-hidden">
       {/* Decorative elements */}
-      <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl"></div>
+      <div className="absolute top-0 right-0 w-48 h-48 sm:w-72 sm:h-72 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-48 h-48 sm:w-72 sm:h-72 bg-gradient-to-tr from-blue-400/20 to-cyan-400/20 rounded-full blur-3xl"></div>
       
-      <div className="relative p-10">
-        <div className="flex items-center gap-5 mb-8">
-          <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 via-orange-400 to-pink-500 rounded-3xl flex items-center justify-center text-4xl shadow-2xl shadow-orange-500/50 transform hover:scale-110 hover:rotate-12 transition-all duration-300">
+      <div className="relative p-5 sm:p-8 md:p-10">
+        <div className="flex items-center gap-3 sm:gap-5 mb-6 sm:mb-8">
+          <div className="relative flex-shrink-0">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gradient-to-br from-yellow-400 via-orange-400 to-pink-500 rounded-2xl sm:rounded-3xl flex items-center justify-center text-2xl sm:text-3xl md:text-4xl shadow-2xl shadow-orange-500/50 transform hover:scale-110 hover:rotate-12 transition-all duration-300">
               ✨
             </div>
-            <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-lg shadow-lg animate-bounce">
+            <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-sm sm:text-lg shadow-lg animate-bounce">
               💡
             </div>
           </div>
-          <div className="flex-1">
-            <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 mb-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 mb-1 sm:mb-2">
               {editMode ? 'Edit Your Idea' : 'Share Your Brilliant Idea'}
             </h3>
-            <p className="text-base text-gray-600 dark:text-gray-400 font-medium">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-medium">
               {editMode ? 'Update your idea to make it even better!' : 'The world needs your creativity! Share your vision with the community.'}
             </p>
           </div>
@@ -110,7 +110,7 @@ export function IdeaForm({ onSubmit, editMode, onCancelEdit }: IdeaFormProps) {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Title input */}
         <div>
-          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
             Title (Subject)
           </label>
           <input
@@ -118,12 +118,12 @@ export function IdeaForm({ onSubmit, editMode, onCancelEdit }: IdeaFormProps) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Give your idea a catchy title... 🎯"
-            className="w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-base shadow-sm transition-all"
+            className="w-full p-3 sm:p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-sm sm:text-base shadow-sm transition-all"
             maxLength={100}
             disabled={isSubmitting}
           />
           <div className="flex justify-between items-center mt-2 px-1">
-            <span className={`text-sm font-medium transition-colors ${
+            <span className={`text-xs sm:text-sm font-medium transition-colors ${
               remainingTitleChars < 20 
                 ? 'text-red-600 dark:text-red-400' 
                 : remainingTitleChars < 40 
@@ -140,20 +140,20 @@ export function IdeaForm({ onSubmit, editMode, onCancelEdit }: IdeaFormProps) {
 
         {/* Description textarea */}
         <div>
-          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
             Description
           </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Describe your idea in detail... Be creative! ✨"
-            className="w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800 dark:text-white resize-none text-base shadow-sm transition-all"
-            rows={5}
+            className="w-full p-3 sm:p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800 dark:text-white resize-none text-sm sm:text-base shadow-sm transition-all"
+            rows={4}
             maxLength={500}
             disabled={isSubmitting}
           />
           <div className="flex justify-between items-center mt-2 px-1">
-            <span className={`text-sm font-medium transition-colors ${
+            <span className={`text-xs sm:text-sm font-medium transition-colors ${
               remainingDescChars < 50 
                 ? 'text-red-600 dark:text-red-400' 
                 : remainingDescChars < 100 
@@ -187,13 +187,13 @@ export function IdeaForm({ onSubmit, editMode, onCancelEdit }: IdeaFormProps) {
           </div>
         )}
 
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           {editMode && onCancelEdit && (
             <button
               type="button"
               onClick={onCancelEdit}
               disabled={isSubmitting}
-              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-black py-5 px-8 rounded-2xl shadow-2xl focus:ring-4 focus:ring-gray-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 text-lg"
+              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-black py-3 sm:py-4 md:py-5 px-6 sm:px-8 rounded-xl sm:rounded-2xl shadow-2xl focus:ring-4 focus:ring-gray-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 text-base sm:text-lg"
             >
               Cancel
             </button>
@@ -201,16 +201,17 @@ export function IdeaForm({ onSubmit, editMode, onCancelEdit }: IdeaFormProps) {
           <button
             type="submit"
             disabled={isSubmitting || !title.trim() || !description.trim() || title.length > 100 || description.length > 500}
-            className="flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white font-black py-5 px-8 rounded-2xl shadow-2xl hover:shadow-purple-500/50 focus:ring-4 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 text-lg"
+            className="flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white font-black py-3 sm:py-4 md:py-5 px-6 sm:px-8 rounded-xl sm:rounded-2xl shadow-2xl hover:shadow-purple-500/50 focus:ring-4 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 text-base sm:text-lg"
           >
             {isSubmitting ? (
-              <span className="flex items-center justify-center gap-3">
-                <div className="animate-spin rounded-full h-6 w-6 border-3 border-white border-t-transparent"></div>
-                <span>{editMode ? 'Updating...' : 'Submitting your brilliant idea...'}</span>
+              <span className="flex items-center justify-center gap-2 sm:gap-3">
+                <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-3 border-white border-t-transparent"></div>
+                <span className="hidden sm:inline">{editMode ? 'Updating...' : 'Submitting your brilliant idea...'}</span>
+                <span className="sm:hidden">{editMode ? 'Updating...' : 'Submitting...'}</span>
               </span>
             ) : (
-              <span className="flex items-center justify-center gap-3">
-                <span className="text-2xl">{editMode ? '✏️' : '🚀'}</span>
+              <span className="flex items-center justify-center gap-2 sm:gap-3">
+                <span className="text-xl sm:text-2xl">{editMode ? '✏️' : '🚀'}</span>
                 <span className="tracking-wide">{editMode ? 'Update Idea' : 'Launch Your Idea'}</span>
               </span>
             )}
