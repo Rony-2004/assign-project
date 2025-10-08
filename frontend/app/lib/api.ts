@@ -1,6 +1,7 @@
 import { Idea, ApiResponse } from '../types/api';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+// Remove trailing slash to prevent double slashes in URLs
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api').replace(/\/$/, '');
 
 class ApiClient {
   private async request<T>(
