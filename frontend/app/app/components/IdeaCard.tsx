@@ -7,11 +7,14 @@ import { formatDate, pluralize } from '../../utils/helpers';
 interface IdeaCardProps {
   idea: Idea;
   onUpvote: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
-export function IdeaCard({ idea, onUpvote }: IdeaCardProps) {
+export function IdeaCard({ idea, onUpvote, onEdit, onDelete }: IdeaCardProps) {
   const [isUpvoting, setIsUpvoting] = useState(false);
   const [hasUpvoted, setHasUpvoted] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleUpvote = async () => {
     if (hasUpvoted || isUpvoting) return;
@@ -24,6 +27,20 @@ export function IdeaCard({ idea, onUpvote }: IdeaCardProps) {
       console.error('Error upvoting:', error);
     } finally {
       setIsUpvoting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (isDeleting) return;
+    
+    if (confirm('Are you sure you want to delete this idea?')) {
+      setIsDeleting(true);
+      try {
+        await onDelete();
+      } catch (error) {
+        console.error('Error deleting:', error);
+        setIsDeleting(false);
+      }
     }
   };
 
@@ -86,7 +103,7 @@ export function IdeaCard({ idea, onUpvote }: IdeaCardProps) {
               </p>
             </div>
             
-            <div className="flex items-center gap-2 pt-2">
+            <div className="flex items-center justify-between gap-4 pt-2">
               <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full">
                 <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -94,6 +111,38 @@ export function IdeaCard({ idea, onUpvote }: IdeaCardProps) {
                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                   {formatDate(idea.createdAt)}
                 </span>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onEdit}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Edit
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDeleting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>

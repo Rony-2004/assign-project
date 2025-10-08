@@ -1,26 +1,54 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface IdeaFormProps {
-  onSubmit: (text: string) => Promise<boolean>;
+  onSubmit: (title: string, description: string) => Promise<boolean>;
+  editMode?: {
+    id: string;
+    title: string;
+    description: string;
+  };
+  onCancelEdit?: () => void;
 }
 
-export function IdeaForm({ onSubmit }: IdeaFormProps) {
-  const [text, setText] = useState('');
+export function IdeaForm({ onSubmit, editMode, onCancelEdit }: IdeaFormProps) {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Update form when edit mode changes
+  useEffect(() => {
+    if (editMode) {
+      setTitle(editMode.title);
+      setDescription(editMode.description);
+    } else {
+      setTitle('');
+      setDescription('');
+    }
+  }, [editMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!text.trim()) {
-      setMessage({ type: 'error', text: 'Please enter an idea' });
+    if (!title.trim()) {
+      setMessage({ type: 'error', text: 'Please enter a title' });
       return;
     }
 
-    if (text.length > 500) {
-      setMessage({ type: 'error', text: 'Idea must be 500 characters or less' });
+    if (!description.trim()) {
+      setMessage({ type: 'error', text: 'Please enter a description' });
+      return;
+    }
+
+    if (title.length > 100) {
+      setMessage({ type: 'error', text: 'Title must be 100 characters or less' });
+      return;
+    }
+
+    if (description.length > 500) {
+      setMessage({ type: 'error', text: 'Description must be 500 characters or less' });
       return;
     }
 
@@ -28,13 +56,20 @@ export function IdeaForm({ onSubmit }: IdeaFormProps) {
     setMessage(null);
 
     try {
-      const success = await onSubmit(text.trim());
+      const success = await onSubmit(title.trim(), description.trim());
       if (success) {
-        setText('');
-        setMessage({ type: 'success', text: 'Idea submitted successfully!' });
+        setTitle('');
+        setDescription('');
+        setMessage({ 
+          type: 'success', 
+          text: editMode ? 'Idea updated successfully!' : 'Idea submitted successfully!' 
+        });
         setTimeout(() => setMessage(null), 3000);
       } else {
-        setMessage({ type: 'error', text: 'Failed to submit idea. Please try again.' });
+        setMessage({ 
+          type: 'error', 
+          text: editMode ? 'Failed to update idea. Please try again.' : 'Failed to submit idea. Please try again.' 
+        });
       }
     } catch {
       setMessage({ type: 'error', text: 'An error occurred. Please try again.' });
@@ -43,7 +78,8 @@ export function IdeaForm({ onSubmit }: IdeaFormProps) {
     }
   };
 
-  const remainingChars = 500 - text.length;
+  const remainingTitleChars = 100 - title.length;
+  const remainingDescChars = 500 - description.length;
 
   return (
     <div className="relative bg-gradient-to-br from-white via-purple-50 to-pink-50 dark:from-gray-800 dark:via-purple-900/20 dark:to-gray-900 rounded-3xl shadow-2xl border-2 border-purple-200 dark:border-purple-800 overflow-hidden">
@@ -63,34 +99,68 @@ export function IdeaForm({ onSubmit }: IdeaFormProps) {
           </div>
           <div className="flex-1">
             <h3 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 mb-2">
-              Share Your Brilliant Idea
+              {editMode ? 'Edit Your Idea' : 'Share Your Brilliant Idea'}
             </h3>
             <p className="text-base text-gray-600 dark:text-gray-400 font-medium">
-              The world needs your creativity! Share your vision with the community.
+              {editMode ? 'Update your idea to make it even better!' : 'The world needs your creativity! Share your vision with the community.'}
             </p>
           </div>
         </div>
       
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Title input */}
         <div>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+            Title (Subject)
+          </label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Give your idea a catchy title... 🎯"
+            className="w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800 dark:text-white text-base shadow-sm transition-all"
+            maxLength={100}
+            disabled={isSubmitting}
+          />
+          <div className="flex justify-between items-center mt-2 px-1">
+            <span className={`text-sm font-medium transition-colors ${
+              remainingTitleChars < 20 
+                ? 'text-red-600 dark:text-red-400' 
+                : remainingTitleChars < 40 
+                ? 'text-yellow-600 dark:text-yellow-400' 
+                : 'text-gray-500 dark:text-gray-400'
+            }`}>
+              {remainingTitleChars} characters left
+            </span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">
+              Max 100 characters
+            </span>
+          </div>
+        </div>
+
+        {/* Description textarea */}
+        <div>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+            Description
+          </label>
           <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Describe your idea here... Be creative! ✨"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Describe your idea in detail... Be creative! ✨"
             className="w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 dark:bg-gray-800 dark:text-white resize-none text-base shadow-sm transition-all"
             rows={5}
             maxLength={500}
             disabled={isSubmitting}
           />
-          <div className="flex justify-between items-center mt-3 px-1">
+          <div className="flex justify-between items-center mt-2 px-1">
             <span className={`text-sm font-medium transition-colors ${
-              remainingChars < 50 
+              remainingDescChars < 50 
                 ? 'text-red-600 dark:text-red-400' 
-                : remainingChars < 100 
+                : remainingDescChars < 100 
                 ? 'text-yellow-600 dark:text-yellow-400' 
                 : 'text-gray-500 dark:text-gray-400'
             }`}>
-              {remainingChars} characters left
+              {remainingDescChars} characters left
             </span>
             <span className="text-xs text-gray-400 dark:text-gray-500">
               Max 500 characters
@@ -117,23 +187,35 @@ export function IdeaForm({ onSubmit }: IdeaFormProps) {
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={isSubmitting || !text.trim() || text.length > 500}
-          className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white font-black py-5 px-8 rounded-2xl shadow-2xl hover:shadow-purple-500/50 focus:ring-4 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 text-lg"
-        >
-          {isSubmitting ? (
-            <span className="flex items-center justify-center gap-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-3 border-white border-t-transparent"></div>
-              <span>Submitting your brilliant idea...</span>
-            </span>
-          ) : (
-            <span className="flex items-center justify-center gap-3">
-              <span className="text-2xl">🚀</span>
-              <span className="tracking-wide">Launch Your Idea</span>
-            </span>
+        <div className="flex gap-3">
+          {editMode && onCancelEdit && (
+            <button
+              type="button"
+              onClick={onCancelEdit}
+              disabled={isSubmitting}
+              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-black py-5 px-8 rounded-2xl shadow-2xl focus:ring-4 focus:ring-gray-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 text-lg"
+            >
+              Cancel
+            </button>
           )}
-        </button>
+          <button
+            type="submit"
+            disabled={isSubmitting || !title.trim() || !description.trim() || title.length > 100 || description.length > 500}
+            className="flex-1 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600 text-white font-black py-5 px-8 rounded-2xl shadow-2xl hover:shadow-purple-500/50 focus:ring-4 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 text-lg"
+          >
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-3">
+                <div className="animate-spin rounded-full h-6 w-6 border-3 border-white border-t-transparent"></div>
+                <span>{editMode ? 'Updating...' : 'Submitting your brilliant idea...'}</span>
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-3">
+                <span className="text-2xl">{editMode ? '✏️' : '🚀'}</span>
+                <span className="tracking-wide">{editMode ? 'Update Idea' : 'Launch Your Idea'}</span>
+              </span>
+            )}
+          </button>
+        </div>
       </form>
       </div>
     </div>

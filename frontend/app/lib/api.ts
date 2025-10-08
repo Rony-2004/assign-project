@@ -55,6 +55,20 @@ class ApiClient {
     });
     return response.data;
   }
+
+  async updateIdea(id: string, title: string, description: string): Promise<Idea> {
+    const response = await this.request<Idea>(`/ideas/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ title, description }),
+    });
+    return response.data;
+  }
+
+  async deleteIdea(id: string): Promise<void> {
+    await this.request<null>(`/ideas/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

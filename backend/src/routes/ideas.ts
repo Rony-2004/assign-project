@@ -118,6 +118,33 @@ export default async function ideaRoutes(fastify: FastifyInstance) {
     }
   });
 
+  // Update an idea
+  fastify.put('/ideas/:id', async (request: FastifyRequest<{ Params: { id: string }; Body: CreateIdeaRequest }>, reply: FastifyReply) => {
+    try {
+      const { id } = request.params;
+      const body = createIdeaSchema.parse(request.body);
+
+      const updatedIdea = await db
+        .update(ideas)
+        .set({
+          title: sanitizeText(body.title),
+          description: sanitizeText(body.description),
+          updatedAt: new Date(),
+        })
+        .where(eq(ideas.id, id))
+        .returning();
+
+      if (updatedIdea.length === 0) {
+        return reply.status(404).send(createErrorResponse('NOT_FOUND', 'Idea not found'));
+      }
+
+      return reply.send(createSuccessResponse(updatedIdea[0], 'Idea updated successfully'));
+    } catch (error) {
+      console.error('Error updating idea:', error);
+      return reply.status(500).send(createErrorResponse('UPDATE_ERROR', 'Failed to update idea'));
+    }
+  });
+
   // Delete an idea (optional - for admin purposes)
   fastify.delete('/ideas/:id', async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
     try {

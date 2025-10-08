@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Header } from '../components/Header';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorBoundary } from '../components/ErrorBoundary';
@@ -9,7 +10,29 @@ import { useIdeas } from '../hooks/useIdeas';
 import { pluralize } from '../utils/helpers';
 
 export default function IdeaBoardApp() {
-  const { ideas, loading, error, submitIdea, upvoteIdea, refreshIdeas } = useIdeas();
+  const { ideas, loading, error, submitIdea, upvoteIdea, updateIdea, deleteIdea, refreshIdeas } = useIdeas();
+  const [editingIdea, setEditingIdea] = useState<{ id: string; title: string; description: string } | null>(null);
+
+  const handleSubmit = async (title: string, description: string) => {
+    if (editingIdea) {
+      const success = await updateIdea(editingIdea.id, title, description);
+      if (success) {
+        setEditingIdea(null);
+      }
+      return success;
+    }
+    return await submitIdea(title, description);
+  };
+
+  const handleEdit = (id: string, title: string, description: string) => {
+    setEditingIdea({ id, title, description });
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIdea(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-900">
@@ -23,7 +46,11 @@ export default function IdeaBoardApp() {
       <main className="max-w-6xl mx-auto px-6 py-12 space-y-12">
         {/* Idea Submission Form */}
         <div className="transform hover:scale-[1.01] transition-transform duration-300">
-          <IdeaForm onSubmit={submitIdea} />
+          <IdeaForm 
+            onSubmit={handleSubmit}
+            editMode={editingIdea || undefined}
+            onCancelEdit={handleCancelEdit}
+          />
         </div>
 
         {/* Ideas List */}
@@ -88,6 +115,8 @@ export default function IdeaBoardApp() {
                   key={idea.id}
                   idea={idea}
                   onUpvote={() => upvoteIdea(idea.id)}
+                  onEdit={() => handleEdit(idea.id, idea.title, idea.description)}
+                  onDelete={() => deleteIdea(idea.id)}
                 />
               ))}
             </div>

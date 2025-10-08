@@ -8,8 +8,10 @@ interface UseIdeasReturn {
   loading: boolean;
   error: string | null;
   fetchIdeas: () => Promise<void>;
-  submitIdea: (text: string) => Promise<boolean>;
+  submitIdea: (title: string, description: string) => Promise<boolean>;
   upvoteIdea: (id: string) => Promise<void>;
+  updateIdea: (id: string, title: string, description: string) => Promise<boolean>;
+  deleteIdea: (id: string) => Promise<void>;
   refreshIdeas: () => Promise<void>;
 }
 
@@ -70,11 +72,11 @@ export function useIdeas(): UseIdeasReturn {
     }
   }, []);
 
-  const submitIdea = useCallback(async (text: string): Promise<boolean> => {
+  const submitIdea = useCallback(async (title: string, description: string): Promise<boolean> => {
     try {
       try {
         // Try to submit via API first
-        const newIdea = await apiClient.createIdea(text);
+        const newIdea = await apiClient.createIdea(`${title}\n\n${description}`);
         setIdeas(prev => [newIdea, ...prev]);
         return true;
       } catch (apiError) {
@@ -84,8 +86,8 @@ export function useIdeas(): UseIdeasReturn {
       // Fallback to mock implementation
       const newIdea: Idea = {
         id: Date.now().toString(),
-        title: text.substring(0, 100),
-        description: text,
+        title: title,
+        description: description,
         upvotes: 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
@@ -96,6 +98,54 @@ export function useIdeas(): UseIdeasReturn {
     } catch (err) {
       console.error('Error submitting idea:', err);
       return false;
+    }
+  }, []);
+
+  const updateIdea = useCallback(async (id: string, title: string, description: string): Promise<boolean> => {
+    try {
+      try {
+        // Try to update via API first
+        const updatedIdea = await apiClient.updateIdea(id, title, description);
+        setIdeas(prev => 
+          prev.map(idea => 
+            idea.id === id ? updatedIdea : idea
+          )
+        );
+        return true;
+      } catch (apiError) {
+        console.log('API not available for update, using mock:', apiError);
+      }
+      
+      // Fallback to mock implementation
+      setIdeas(prev => 
+        prev.map(idea => 
+          idea.id === id 
+            ? { ...idea, title, description, updatedAt: new Date().toISOString() }
+            : idea
+        )
+      );
+      return true;
+    } catch (err) {
+      console.error('Error updating idea:', err);
+      return false;
+    }
+  }, []);
+
+  const deleteIdea = useCallback(async (id: string): Promise<void> => {
+    try {
+      try {
+        // Try to delete via API first
+        await apiClient.deleteIdea(id);
+        setIdeas(prev => prev.filter(idea => idea.id !== id));
+        return;
+      } catch (apiError) {
+        console.log('API not available for delete, using mock:', apiError);
+      }
+      
+      // Fallback to mock implementation
+      setIdeas(prev => prev.filter(idea => idea.id !== id));
+    } catch (err) {
+      console.error('Error deleting idea:', err);
     }
   }, []);
 
@@ -148,6 +198,8 @@ export function useIdeas(): UseIdeasReturn {
     fetchIdeas,
     submitIdea,
     upvoteIdea,
+    updateIdea,
+    deleteIdea,
     refreshIdeas,
   };
 }
