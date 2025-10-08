@@ -59,9 +59,33 @@ async function buildApp() {
     });
 
     await fastify.register(cors, {
-      origin: config.cors.origin.split(',').map(origin => origin.trim()),
+      origin: (origin, callback) => {
+        const allowedOrigins = config.cors.origin.split(',').map(o => o.trim());
+        
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) {
+          callback(null, true);
+          return;
+        }
+        
+        // Check if origin matches any allowed pattern
+        const isAllowed = allowedOrigins.some(allowedOrigin => {
+          // Exact match
+          if (origin === allowedOrigin) return true;
+          
+          // Pattern match for Vercel preview deployments
+          if (allowedOrigin.includes('*.vercel.app') && origin.endsWith('.vercel.app')) {
+            return true;
+          }
+          
+          return false;
+        });
+        
+        callback(null, isAllowed);
+      },
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
     });
 
     await fastify.register(rateLimit, {
